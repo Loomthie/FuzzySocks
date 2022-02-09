@@ -46,7 +46,6 @@ class Data:
             '''
             return msg
 
-
     def __init__(self, **kwargs):
         self.__vars = []
         for i in kwargs:
@@ -57,8 +56,10 @@ class Data:
             self.__vars.append(i)
 
     def descriptiveStats(self,*args):
+        res = []
         for i in args:
-            yield Data.__DescriptiveStats(self.__dict__[i])
+            res.append(Data.__DescriptiveStats(self.__dict__[i]))
+        return res
 
     @staticmethod
     def z_calc(p):
