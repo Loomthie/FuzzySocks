@@ -32,7 +32,6 @@ class Data:
             mean = {self.mean}
             Standard Error = {self.stErr}
             Median = {self.median}
-            Mode = {self.mode}
             Standard Deviation = {self.stDev}
             Variance = {self.var}
             Kurtosis = {self.kurtosis}
