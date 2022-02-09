@@ -13,7 +13,7 @@ class Data:
             self.mean = pyStats.mean(data)
             self.stErr = pyStats.stdev(data) / np.sqrt(len(data))
             self.median = pyStats.median(data)
-            self.mode = pyStats.mode(data)
+            #self.mode = pyStats.mode(data)
             self.stDev = pyStats.stdev(data)
             self.var = self.stDev ** 2
             self.kurtosis = len(data) * sum([(i - self.mean) ** 4 for i in data]) / self.var
