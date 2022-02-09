@@ -6,6 +6,47 @@ import statistics as pyStats
 
 
 class Data:
+
+    class __DescriptiveStats:
+        def __init__(self, data, name='N/A'):
+            self.name = name
+            self.mean = pyStats.mean(data)
+            self.stErr = pyStats.stdev(data) / np.sqrt(len(data))
+            self.median = pyStats.median(data)
+            self.mode = pyStats.mode(data)
+            self.stDev = pyStats.stdev(data)
+            self.var = self.stDev ** 2
+            self.kurtosis = len(data) * sum([(i - self.mean) ** 4 for i in data]) / self.var
+            self.skewness = sum([(i - self.mean) ** 3 for i in data]) / (len(data) - 1) / self.stDev ** 3
+            self.range = max(data) - min(data)
+            self.min = min(data)
+            self.max = max(data)
+            self.count = len(data)
+            self.sum = sum(data)
+
+        def __repr__(self):
+            msg = f'''
+
+            Dataset: {self.name}
+
+            mean = {self.mean}
+            Standard Error = {self.stErr}
+            Median = {self.median}
+            Mode = {self.mode}
+            Standard Deviation = {self.stDev}
+            Variance = {self.var}
+            Kurtosis = {self.kurtosis}
+            Skewness = {self.skewness}
+            Range = {self.skewness}
+            Minimum = {self.min}
+            Maximum = {self.max}
+            Count = {self.count}
+            Sum = {self.sum}
+
+            '''
+            return msg
+
+
     def __init__(self, **kwargs):
         self.__vars = []
         for i in kwargs:
@@ -14,6 +55,10 @@ class Data:
             self.__dict__[i] = kwargs[i]
             self.__dict__[i].sort()
             self.__vars.append(i)
+
+    def descriptiveStats(self,*args):
+        for i in args:
+            yield Data.__DescriptiveStats(self.__dict__[i])
 
     @staticmethod
     def z_calc(p):
