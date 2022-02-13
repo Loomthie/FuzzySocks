@@ -7,6 +7,45 @@ import statistics as pyStats
 
 class Data:
 
+
+    def __init__(self, **kwargs):
+        self.__vars = []
+        for i in kwargs:
+            if type(kwargs[i]) != list:
+                raise TypeError("Must enter list or array for kwarg arguements")
+            self.__dict__[i] = kwargs[i]
+            self.__vars.append(i)
+
+    @staticmethod
+    def R_calc(x, y):
+        sx = pyStats.stdev(x)
+        sy = pyStats.stdev(y)
+        xy = []
+        for i in range(len(x)):
+            xy.append([x[i], y[i]])
+        r = 1 / (len(x) - 1) * (sum([(i - pyStats.mean(x)) * (j - pyStats.mean(y)) for i, j in xy]) / (sx * sy))
+        return r ** 2
+
+
+class DatasetExamples:
+
+    @classmethod
+    def TwoDiceSum(cls, n=1000):
+        res = [0] * int(n)
+        for i in range(int(n)):
+            dice = [np.random.randint(1, 7), np.random.randint(1, 7)]
+            res[i] = sum(dice)
+        return Distribution(Dice_sum=res)
+
+    @classmethod
+    def NormalDistribution(cls, n=1000):
+        res = [0] * n
+        for i in range(n):
+            res[i] = np.random.normal()
+        return Distribution(Norm_Values=res)
+
+
+class Distribution(Data):
     class __DescriptiveStats:
         def __init__(self, data, name='N/A'):
             self.name = name
@@ -46,55 +85,14 @@ class Data:
             return msg
 
     def __init__(self, **kwargs):
-        self.__vars = []
-        for i in kwargs:
-            if type(kwargs[i]) != list:
-                raise TypeError("Must enter list or array for kwarg arguements")
-            self.__dict__[i] = kwargs[i]
-            self.__dict__[i].sort()
-            self.__vars.append(i)
-
-    def descriptiveStats(self,*args):
-        res = []
-        for i in args:
-            res.append(Data.__DescriptiveStats(self.__dict__[i]))
-        return res
-
-    @staticmethod
-    def z_calc(p):
-        return stats.norm.ppf(p)
-
-    @staticmethod
-    def R_calc(x, y):
-        sx = pyStats.stdev(x)
-        sy = pyStats.stdev(y)
-        xy = []
-        for i in range(len(x)):
-            xy.append([x[i], y[i]])
-        r = 1 / (len(x) - 1) * (sum([(i - pyStats.mean(x)) * (j - pyStats.mean(y)) for i, j in xy]) / (sx * sy))
-        return r ** 2
-
-
-class DatasetExamples:
-
-    @classmethod
-    def TwoDiceSum(cls, n=1000):
-        res = [0] * int(n)
-        for i in range(int(n)):
-            dice = [np.random.randint(1, 7), np.random.randint(1, 7)]
-            res[i] = sum(dice)
-        return Distribution(Dice_sum=res)
-
-    @classmethod
-    def NormalDistribution(cls, n=1000):
-        res = [0] * n
-        for i in range(n):
-            res[i] = np.random.normal()
-        return Distribution(Norm_Values=res)
-
-
-class Distribution(Data):
-    def NormalTest(self, *arg):
+        super().__init__(**kwargs)
+        for i in self.__dict__:
+            try:
+                self.__dict__[i]=sorted(self.__dict__[i])
+            except:
+                continue
+            
+    def normal_test(self, *arg):
         res = {}
         for i in arg:
             perc = np.arange(0, 1, 1 / (len(self.__dict__[i]) + 1))
@@ -137,7 +135,7 @@ class Distribution(Data):
             htmlFile.write(msg)
         return res
 
-    def BoxPlot(self, *args):
+    def box_plot(self, *args):
         fig = make_subplots()
         if args[0].upper() == "ALL":
             for i in self._Data__vars:
@@ -147,8 +145,24 @@ class Distribution(Data):
                 fig.add_trace(go.Box({'x': self.__dict__[i]}, name=i))
         fig.show()
 
-    def Histogram(self, *args):
+    def histogram(self, *args):
         fig = make_subplots(rows=len(args), cols=1)
         for row in range(len(args)):
             fig.add_trace(go.Histogram({'x': self.__dict__[args[row]]}), row=row + 1, col=1)
         fig.show()
+
+    def desc_stats(self,*args):
+        res = []
+        for i in args:
+            res.append(Data.__DescriptiveStats(self.__dict__[i]))
+        return res
+
+    @staticmethod
+    def z_calc(p):
+        return stats.norm.ppf(p)
+
+
+class Correlation(Data):
+
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
