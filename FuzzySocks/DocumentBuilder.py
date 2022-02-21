@@ -79,12 +79,15 @@ class p(h1):
 class table(element):
     tag='table'
 
-    def add_row(self,*args,header_row=False):
+    def add_row(self,*args,header=()):
         self.body += '<tr>\n'
-        tag = 'td'
-        if header_row:
-            tag = 'th'
-        for i in args:
+        if header == ():
+            header = [False]*len(args)
+        for i,j in zip(args,header):
+            if j:
+                tag = 'th'
+            else:
+                tag = 'td'
             self.body += f'<{tag}>{i}</{tag}>\n'
         self.body += '</tr>\n'
 
