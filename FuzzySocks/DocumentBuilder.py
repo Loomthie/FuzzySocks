@@ -137,4 +137,9 @@ class Document:
             file.write(self.__fileContent.format(self=self))
         web.open(f'file://{os.path.realpath("temp.html")}')
         time.sleep(1)
-        os.remove("temp.html")
+        while True:
+            try:
+                os.remove("temp.html")
+                break
+            except PermissionError:
+                continue
