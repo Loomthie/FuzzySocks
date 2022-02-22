@@ -6,7 +6,7 @@ setup(
     packages=['FuzzySocks'],
     url='',
     license='',
-    author='Loomthie',
+    author='Donald M.',
     author_email='mcfarldl@mail.uc.edu',
     description='Don\'t you love some fuzzy socks!'
 )
