@@ -2,6 +2,7 @@ import numpy as np
 from plotly.subplots import make_subplots as plot
 import plotly.graph_objects as go
 import statistics as stats
+from FuzzySocks.Solve import newtoninan_solver as newt
 
 class Data:
     vals = {}
@@ -106,4 +107,56 @@ Intercept = {self.intercept}
         for y in args:
             fig.add_trace(go.Scatter(x=x,y=self.vals[y],mode=mode))
         return fig
+
+    def get_polynomial_model(self,x,y,degree=2,tol=1e-5):
+        args = [0]*(degree+1)
+        fprime = []
+        xy = []
+        delta_x = []
+        for i,j in zip(self.vals[x],self.vals[y]):
+            xy.append([i,j])
+        for i in range(len(args)-1):
+            fprime.append([])
+            delta_x.append(None)
+            if i==0:
+                vals = xy
+            else:
+                vals = fprime[i-1]
+            for k,j in zip(vals[:len(vals)-1],vals[1:]):
+                fprime[i].append([(k[0]+j[0])/2,(j[1]-k[1])/(j[0]-k[0])])
+                if delta_x[i] is None:
+                    delta_x[i] = j[0]-k[0]
+        fprime.insert(0,xy)
+
+        for i in range(len(args)):
+            if i >= 2:
+                for n in range(i,1,-1):
+                    args[int(i-n)]=args[i-n]/n
+
+            def f(a,x):
+                res = 0
+                for n in range(i):
+                    res+=args[n]*x**(i-n)
+                res+=a
+                return res
+
+            def model(a,x,y):
+                res = f(a,x)
+                return res-(y-gamma)
+
+            gamma = 0
+            if i == 2:
+                x = fprime[len(fprime)-1-i][0][0]
+                x1 = x+delta_x[0]/2
+                x2 = x-delta_x[0]/2
+                gamma = (args[0]/12)*(x1-x2)**2
+            args[i] = newt(tol,model,1,fprime[len(fprime)-1-i][0][0],fprime[len(fprime)-1-i][0][1])
+
+        return args
+
+
+
+
+
+
 
